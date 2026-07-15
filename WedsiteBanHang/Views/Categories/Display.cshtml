@@ -1,0 +1,27 @@
+﻿@model WedsiteBanHang.Models.Category
+
+@{
+    ViewData["Title"] = "Chi tiết danh mục";
+}
+
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="card shadow">
+        <div class="card-header bg-info text-white">
+            <h4 class="mb-0">Thông Tin Chi Tiết Danh Mục</h4>
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-4 fw-bold">Mã danh mục (ID):</dt>
+                <dd class="col-sm-8">@Model.Id</dd>
+
+                <dt class="col-sm-4 fw-bold">Tên danh mục:</dt>
+                <dd class="col-sm-8">@Model.Name</dd>
+            </dl>
+            <hr />
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Chỉnh sửa</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,15 +12,15 @@ using WedsiteBanHang.Models;
 namespace WedsiteBanHang.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260615235857_ExtendIdentityUser")]
-    partial class ExtendIdentityUser
+    [Migration("20260715034027_InitNewDatabase")]
+    partial class InitNewDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.3")
+                .HasAnnotation("ProductVersion", "8.0.28")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

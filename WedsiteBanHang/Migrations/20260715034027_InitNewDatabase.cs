@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace WedsiteBanHang.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitNewDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

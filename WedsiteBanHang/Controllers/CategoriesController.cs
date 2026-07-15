@@ -1,100 +1,123 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using WedsiteBanHang.Data;
 using WedsiteBanHang.Models;
-using WedsiteBanHang.Repositories;
 
 namespace WedsiteBanHang.Controllers
 {
     public class CategoriesController : Controller
     {
-        private readonly ICategoryRepository _categoryRepository;
+        private readonly ApplicationDbContext _context;
 
-        // Dependency Injection để lấy Repository xử lý danh mục
-        public CategoriesController(ICategoryRepository categoryRepository)
+        public CategoriesController(ApplicationDbContext context)
         {
-            _categoryRepository = categoryRepository;
+            _context = context;
         }
 
-        // 1. Hiển thị danh sách danh mục (Index)
+        // 1. HIỂN THỊ DANH SÁCH (Index)
         public async Task<IActionResult> Index()
         {
-            var categories = await _categoryRepository.GetAllAsync();
+            var categories = await _context.Categories.ToListAsync();
             return View(categories);
         }
 
-        // 2. Hiển thị form thêm danh mục mới (Add - GET)
-        public async Task<IActionResult> Add()
+        // 2. CHI TIẾT DANH MỤC (Details)
+        public async Task<IActionResult> Details(int? id)
         {
-            return View();
+            if (id == null) return NotFound();
+
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (category == null) return NotFound();
+
+            return View(category);
         }
 
-        // 3. Xử lý lưu danh mục mới khi submit form (Add - POST)
+        // 3. THÊM MỚI (Create - GET)
+        public IActionResult Create()
+        {
+            // Đã sửa: Chỉ định hiển thị file Add.cshtml thay vì Create.cshtml
+            return View("Add");
+        }
+
+        // 3. THÊM MỚI (Create - POST)
         [HttpPost]
-        public async Task<IActionResult> Add(Category category)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,Name")] Category category)
         {
             if (ModelState.IsValid)
             {
-                await _categoryRepository.AddAsync(category);
+                _context.Add(category);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            // Đã sửa: Trả lại dữ liệu về giao diện Add.cshtml nếu form nhập bị lỗi
+            return View("Add", category);
+        }
+
+        // 4. CẬP NHẬT (Edit - GET)
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var category = await _context.Categories.FindAsync(id);
+            if (category == null) return NotFound();
+            return View(category);
+        }
+
+        // 4. CẬP NHẬT (Edit - POST)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name")] Category category)
+        {
+            if (id != category.Id) return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(category);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!CategoryExists(category.Id)) return NotFound();
+                    else throw;
+                }
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
         }
 
-        // 4. Hiển thị form cập nhật thông tin danh mục (Update - GET)
-        public async Task<IActionResult> Update(int id)
+        // 5. XÓA (Delete - GET: Hiển thị trang xác nhận xóa)
+        public async Task<IActionResult> Delete(int? id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
+
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (category == null) return NotFound();
+
             return View(category);
         }
 
-        // 5. Xử lý lưu thông tin danh mục sau khi sửa (Update - POST)
-        [HttpPost]
-        public async Task<IActionResult> Update(int id, Category category)
-        {
-            if (id != category.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                await _categoryRepository.UpdateAsync(category);
-                return RedirectToAction(nameof(Index));
-            }
-            return View(category);
-        }
-
-        // 6. Hiển thị trang xác nhận xóa danh mục (Delete - GET)
-        public async Task<IActionResult> Delete(int id)
-        {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
-        }
-
-        // 7. Thực hiện hành động xóa danh mục (DeleteConfirmed - POST)
-        [HttpPost, ActionName("DeleteConfirmed")]
+        // 5. XÓA (Delete - POST: Thực hiện xóa thực tế)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _categoryRepository.DeleteAsync(id);
+            var category = await _context.Categories.FindAsync(id);
+            if (category != null)
+            {
+                _context.Categories.Remove(category);
+                await _context.SaveChangesAsync();
+            }
             return RedirectToAction(nameof(Index));
         }
 
-        // 8. Hiển thị thông tin chi tiết danh mục (Display)
-        public async Task<IActionResult> Display(int id)
+        private bool CategoryExists(int id)
         {
-            var category = await _categoryRepository.GetByIdAsync(id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-            return View(category);
+            return _context.Categories.Any(e => e.Id == id);
         }
     }
 }
