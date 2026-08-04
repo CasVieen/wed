@@ -1,5 +1,61 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model WedsiteBanHang.Models.Product
+
 @{
+    ViewData["Title"] = "Chi tiết sản phẩm";
 }
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+            <h3 class="card-title mb-0">Chi tiết sản phẩm</h3>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Cột hiển thị hình ảnh sản phẩm (nếu có) -->
+                <div class="col-md-4 text-center mb-3">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded border shadow-sm" style="max-height: 300px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <img src="https://via.placeholder.com/300x300?text=No+Image" alt="No Image" class="img-fluid rounded border" />
+                    }
+                </div>
+
+                <!-- Cột hiển thị thông tin chi tiết -->
+                <div class="col-md-8">
+                    <h2 class="text-primary fw-bold">@Model.Name</h2>
+                    <hr />
+
+                    <div class="mb-3">
+                        <span class="fw-bold">Giá bán:</span>
+                        <span class="fs-4 text-danger fw-bold ms-2">@Model.Price.ToString("c")</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="fw-bold">Danh mục:</span>
+                        <span class="badge bg-secondary ms-2 fs-6">@(Model.Category?.Name ?? "N/A")</span>
+                    </div>
+
+                    <div class="mb-3">
+                        <span class="fw-bold">Mô tả sản phẩm:</span>
+                        <p class="text-muted mt-2 p-3 bg-light rounded border">
+                            @(string.IsNullOrEmpty(Model.Description) ? "Chưa có mô tả cho sản phẩm này." : Model.Description)
+                        </p>
+                    </div>
+
+                    <!-- Nút thao tác -->
+                    <div class="mt-4">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                            <i class="bi bi-pencil-square"></i> Chỉnh sửa
+                        </a>
+                        <a asp-action="Index" class="btn btn-secondary ms-2">
+                            <i class="bi bi-arrow-left"></i> Quay lại danh sách
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

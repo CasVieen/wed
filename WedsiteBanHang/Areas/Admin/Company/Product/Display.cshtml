@@ -1,0 +1,29 @@
+﻿@model WedsiteBanHang.Models.Product
+@{
+    ViewData["Title"] = "Chi tiết Sản phẩm";
+}
+
+<div class="col-md-8 offset-md-2">
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/no-image.png" : Model.ImageUrl)"
+                         class="img-fluid rounded border w-100" />
+                </div>
+                <div class="col-md-7">
+                    <h3 class="fw-bold">@Model.Name</h3>
+                    <h4 class="text-danger fw-bold my-3">@string.Format("{0:N0} đ", Model.Price)</h4>
+                    <p><strong>Danh mục:</strong> <span class="badge bg-info text-dark">@(Model.Category?.Name ?? "N/A")</span></p>
+                    <p><strong>Mô tả:</strong></p>
+                    <p class="text-muted">@(Model.Description ?? "Không có mô tả.")</p>
+                    <hr />
+                    <div class="d-flex gap-2">
+                        <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+                        <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning"><i class="bi bi-pencil-square me-1"></i>Chỉnh sửa</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

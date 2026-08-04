@@ -1,5 +1,60 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model WedsiteBanHang.Models.Product
+
 @{
+    ViewData["Title"] = "Xóa sản phẩm";
 }
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h3 class="card-title mb-0">Xác nhận xóa sản phẩm</h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>Cảnh báo:</strong> Bạn có chắc chắn muốn xóa sản phẩm này không? Hành động này không thể hoàn tác!
+                    </div>
+
+                    <div class="row mt-3">
+                        <!-- Hình ảnh sản phẩm -->
+                        <div class="col-md-4 text-center mb-3">
+                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                            {
+                                <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded border shadow-sm" style="max-height: 200px; object-fit: cover;" />
+                            }
+                            else
+                            {
+                                <img src="https://via.placeholder.com/200x200?text=No+Image" alt="No Image" class="img-fluid rounded border" />
+                            }
+                        </div>
+
+                        <!-- Thông tin sản phẩm -->
+                        <div class="col-md-8">
+                            <h4 class="text-dark fw-bold">@Model.Name</h4>
+                            <p class="mb-2"><strong>Giá bán:</strong> <span class="text-danger fw-bold">@Model.Price.ToString("c")</span></p>
+                            <p class="mb-2"><strong>Danh mục:</strong> <span class="badge bg-secondary">@(Model.Category?.Name ?? "N/A")</span></p>
+                            <p class="mb-2"><strong>Mô tả:</strong> @(string.IsNullOrEmpty(Model.Description) ? "Chưa có mô tả" : Model.Description)</p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <!-- Form gửi lệnh Xóa -->
+                    <form asp-action="DeleteConfirmed" method="post" class="d-flex justify-content-between align-items-center">
+                        <input type="hidden" asp-for="Id" />
+
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Hủy bỏ & Quay lại
+                        </a>
+
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Đồng ý Xóa
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

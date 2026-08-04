@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using WedsiteBanHang.Models;
 using WedsiteBanHang.Repositories;
 
-namespace WedsiteBanHang.Areas.Admin.Controllers
+namespace WedsiteBanHang.Areas.Company.Controllers
 {
-    [Area("Admin")]
+    [Area("Company")]
+    [Authorize(Roles = "Company")]
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -17,14 +19,14 @@ namespace WedsiteBanHang.Areas.Admin.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // 1. Danh sách sản phẩm (Index)
+        // 1. Danh sách sản phẩm của Doanh nghiệp (Index)
         public async Task<IActionResult> Index()
         {
             var products = await _productRepository.GetAllAsync();
             return View(products);
         }
 
-        // 2. Xem chi tiết (Display)
+        // 2. Xem chi tiết sản phẩm (Display)
         public async Task<IActionResult> Display(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);

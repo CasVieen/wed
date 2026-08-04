@@ -1,0 +1,20 @@
+﻿@model WedsiteBanHang.Models.Category
+@{
+    ViewData["Title"] = "Xóa Danh mục";
+}
+
+<div class="col-md-6 offset-md-3">
+    <div class="card border-0 shadow-sm border-top border-danger border-4">
+        <div class="card-body p-4 text-center">
+            <i class="bi bi-exclamation-triangle text-danger display-4"></i>
+            <h4 class="fw-bold mt-2">Xác nhận xóa danh mục?</h4>
+            <p class="text-muted">Bạn có chắc chắn muốn xóa danh mục <strong>@Model.Name</strong> không?</p>
+
+            <form asp-action="Delete" method="post" class="mt-4">
+                <input type="hidden" asp-for="Id" />
+                <a asp-action="Index" class="btn btn-secondary me-2">Hủy bỏ</a>
+                <button type="submit" class="btn btn-danger">Xóa Vĩnh Viễn</button>
+            </form>
+        </div>
+    </div>
+</div>

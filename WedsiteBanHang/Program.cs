@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using WedsiteBanHang.Models;
+using WebsiteBanHang.Models;
+using WedsiteBanHang.Models; // Nơi chứa SD và ApplicationUser
 using WedsiteBanHang.Repositories;
-using WedsiteBanHang.Data;
+// Chỉ định rõ ApplicationUser dùng từ Models để tránh xung đột với Data
+using ApplicationUser = WedsiteBanHang.Models.ApplicationUser;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,24 +22,23 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 
 // =====================================================
-// 2. CẤU HÌNH IDENTITY VÀ ROLE (Sử dụng ApplicationUser từ Models)
+// 2. CẤU HÌNH IDENTITY VÀ ROLE
 // =====================================================
 builder.Services
-    // Đã sửa từ WedsiteBanHang.Data.ApplicationUser thành WedsiteBanHang.Models.ApplicationUser
-    .AddIdentity<WedsiteBanHang.Models.ApplicationUser, IdentityRole>(options =>
+    .AddIdentity<ApplicationUser, IdentityRole>(options =>
     {
-        // Cấu hình mật khẩu
+        // Cấu hình mật khẩu (Cho phép mật khẩu dạng admin1@ hoặc Admin123@)
         options.Password.RequiredLength = 6;
         options.Password.RequireDigit = true;
         options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
-        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = true;
         options.Password.RequiredUniqueChars = 1;
 
         // Email không được trùng
         options.User.RequireUniqueEmail = true;
 
-        // Chưa yêu cầu xác nhận email vì đang dùng email giả lập
+        // Chưa yêu cầu xác nhận email
         options.SignIn.RequireConfirmedAccount = false;
         options.SignIn.RequireConfirmedEmail = false;
 
@@ -63,26 +64,25 @@ builder.Services.ConfigureApplicationCookie(options =>
 // =====================================================
 // 3. ĐĂNG KÝ DỊCH VỤ
 // =====================================================
-// Dịch vụ email giả lập
 builder.Services.AddSingleton<IEmailSender, FakeEmailSender>();
 
-// MVC và Razor Pages
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Repository
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
 var app = builder.Build();
 
 // =====================================================
-// 4. TỰ ĐỘNG TẠO CÁC ROLE (Chạy bất đồng bộ lúc khởi động)
+// 4. TỰ ĐỘNG TẠO ROLE VÀ 3 TÀI KHOẢN ADMIN MẶC ĐỊNH
 // =====================================================
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
+    // 4.1. Tạo danh sách Roles
     string[] roleNames =
     {
         SD.Role_Admin,
@@ -106,6 +106,39 @@ using (var scope = app.Services.CreateScope())
             }
         }
     }
+
+    // 4.2. Khởi tạo 3 Admin mặc định
+    var defaultAdmins = new List<(string Username, string Email, string Password, string FullName)>
+    {
+        ("admin1", "admin1@gmail.com", "Admin123@", "Administrator 1"),
+        ("admin2", "admin2@gmail.com", "Admin123@", "Administrator 2"),
+        ("admin3", "admin3@gmail.com", "Admin123@", "Administrator 3")
+    };
+
+    foreach (var admin in defaultAdmins)
+    {
+        // Đã sửa 'userManager' bỏ dấu gạch dưới cho đúng biến
+        var user = await userManager.FindByEmailAsync(admin.Email);
+        if (user == null)
+        {
+            var newAdmin = new ApplicationUser
+            {
+                UserName = admin.Email, // Identity nên dùng Email làm UserName để đăng nhập
+                Email = admin.Email,
+                FullName = admin.FullName,
+                EmailConfirmed = true // Kích hoạt luôn để đăng nhập được ngay
+            };
+
+            // Tạo User với mật khẩu mới
+            var createResult = await userManager.CreateAsync(newAdmin, admin.Password);
+
+            if (createResult.Succeeded)
+            {
+                // Gán quyền Admin cho User
+                await userManager.AddToRoleAsync(newAdmin, SD.Role_Admin);
+            }
+        }
+    }
 }
 
 // =====================================================
@@ -122,12 +155,11 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// Phải đặt Authentication trước Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
 // =====================================================
-// 6. ĐỊNH TUYẾN CÁC ROUTE (Bao gồm Area và Default)
+// 6. ĐỊNH TUYẾN CÁC ROUTE
 // =====================================================
 app.MapControllerRoute(
     name: "areas",
@@ -137,10 +169,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Product}/{action=Index}/{id?}");
 
-// Định tuyến cho các Identity Razor Pages (Login, Register, Logout...)
 app.MapRazorPages();
 
-// Chạy ứng dụng (Đặt lệnh này ở cuối cùng của file)
 app.Run();
 
 // =====================================================

@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "Tổng Quan Gian Hàng";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3 class="fw-bold text-dark mb-1">Tổng quan Doanh nghiệp</h3>
+            <p class="text-secondary mb-0">Chào mừng bạn đến với kênh quản lý bán hàng đối tác.</p>
+        </div>
+        <a asp-area="Company" asp-controller="Product" asp-action="Add" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-circle me-1"></i> Đăng sản phẩm mới
+        </a>
+    </div>
+
+    <!-- Thống kê nhanh -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary fw-semibold">Sản phẩm hiện có</span>
+                        <h2 class="fw-bold text-primary mt-2 mb-0">@ViewBag.TotalProducts</h2>
+                    </div>
+                    <div class="bg-primary bg-opacity-10 p-3 rounded-circle text-primary">
+                        <i class="bi bi-box-seam fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary fw-semibold">Đơn hàng chờ xử lý</span>
+                        <h2 class="fw-bold text-warning mt-2 mb-0">@ViewBag.PendingOrders</h2>
+                    </div>
+                    <div class="bg-warning bg-opacity-10 p-3 rounded-circle text-warning">
+                        <i class="bi bi-clock-history fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm rounded-3 bg-white">
+                <div class="card-body p-4 d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="text-secondary fw-semibold">Doanh thu tạm tính</span>
+                        <h2 class="fw-bold text-success mt-2 mb-0">@string.Format("{0:N0} đ", ViewBag.TotalRevenue)</h2>
+                    </div>
+                    <div class="bg-success bg-opacity-10 p-3 rounded-circle text-success">
+                        <i class="bi bi-cash-stack fs-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

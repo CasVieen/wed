@@ -1,13 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace WedsiteBanHang.Models
+﻿namespace WedsiteBanHang.Models
 {
-    // Category.cs
     public class Category
     {
         public int Id { get; set; }
-        [Required, StringLength(50)]
-        public string Name { get; set; }
-        public List<Product>? Products { get; set; }
+
+        public string Name { get; set; } // Hoặc CategoryName tùy project của bạn
+
+        // THÊM DÒNG NÀY VÀO MODEL:
+        public string? Description { get; set; }
     }
 }
